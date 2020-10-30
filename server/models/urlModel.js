@@ -1,13 +1,13 @@
-const mongoose, { Schema } = require("mongoose");
+const mongoose = require("mongoose");
+const nanoid = require("nanoid");
 
-const urlModelSchema = new Schema({
+const urlModelSchema = mongoose.Schema({
   url: String,
   slug: {
     type: String,
-    index: true
+    index: true,
+    default: nanoid()
   }
 });
 
-const urlModel = mongoose.model("urlModel", urlModelSchema);
-
-export default urlModel;
+module.exports = mongoose.model("urlModel", urlModelSchema);

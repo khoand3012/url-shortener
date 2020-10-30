@@ -1,29 +1,26 @@
 const express = require("express");
 const morgan = require("morgan");
-const urlController = require("./controllers/urlController");
 const mongoose = require("mongoose");
+const routes = require("./routers/router");
 
 const app = express();
 
 const connectionStr = process.env.MONGO_URI;
 
-mongoose.connect(connectionStr);
+mongoose
+  .connect(connectionStr, { useNewUrlParser: true })
+  .then(() => {
+    app.use(express.json());
+    app.use(morgan("tiny"));
 
-mongoose.Promise = global.Promise;
+    app.use(routes);
 
-const db = mongoose.connection;
+    const port = process.env.PORT || 8080;
 
-db.on("error", console.error.bind(console, "MongoDB connection error:"));
-
-app.use(express.json());
-app.use(morgan("tiny"));
-
-app.post("/", urlController.createUrl(req, res));
-
-app.get("/:id", urlController.redirectUrl(req, res));
-
-const port = process.env.PORT || 8080;
-
-app.listen(port, () => {
-  console.log(`App running on port ${port}!`);
-});
+    app.listen(port, () => {
+      console.log(`App running on port ${port}!`);
+    });
+  })
+  .catch((err) => {
+    console.error(err);
+  });
